@@ -24,10 +24,12 @@ class UserRole(models.Model):
 class Hotel(models.Model):
     hotel_name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    longitude = models.CharField(max_length=255)
-    latitude = models.BigIntegerField(null=True)
-    hotel_banner = models.CharField(max_length=255)
-    interior_image = models.CharField(max_length=255)
+    longitude = models.CharField(max_length=50,blank=True, null=True )
+    latitude = models.CharField(max_length=50 ,blank=True, null=True)
+
+    hotel_banner = models.FileField(upload_to="hotel_image" , blank=True, null=True, default='no_image/noimage.png')
+    interior_image = models.FileField(upload_to="hotel_image" ,blank=True, null=True,  default='no_image/noimage.png')
+
     user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, related_name='hotels')
     phone_number = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
