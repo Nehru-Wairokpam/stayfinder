@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import Role, UserRole, Hotel, Room, Payment, Booked, Rating
+from .models import Role, UserRole, Hotel, Room, Payment, Booked, Rating, AdsSlide, Logo
 
 # If you're using a custom user model, import it as well:
 # from .models import CustomUser
@@ -49,6 +49,8 @@ admin.site.register(Rating)
 # Unregister the original User admin and register a custom one if needed
 admin.site.unregister(User)
 admin.site.register(User, BaseUserAdmin)
+admin.site.register(AdsSlide)
+admin.site.register(Logo)
 
 # If using a custom user model (e.g., CustomUser):
 # admin.site.register(CustomUser, BaseUserAdmin)
