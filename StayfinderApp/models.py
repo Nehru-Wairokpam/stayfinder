@@ -3,6 +3,13 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import User
 
+class AdsSlide(models.Model):
+    title = models.CharField(max_length=255)
+    ads_image = models.FileField(upload_to="ads_image" ,blank=True, null=True,  default='no_image/noimage.png')
+    def __str__(self):
+        return self.title
+
+
 
 class Role(models.Model):
     role_name = models.CharField(max_length=255)
@@ -33,6 +40,7 @@ class Hotel(models.Model):
     user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, related_name='hotels')
     phone_number = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
+    picked_of_day=models.BooleanField(default=False)
 
     def __str__(self):
         return self.hotel_name
@@ -45,6 +53,7 @@ class Room(models.Model):
     room_image = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
+    top_ten=models.BooleanField(default=False)
 
     def __str__(self):
         return f"Room {self.room_number} at {self.hotel.hotel_name}"
