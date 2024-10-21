@@ -1,4 +1,3 @@
-from django.db import models
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -50,7 +49,7 @@ class Room(models.Model):
     capacity = models.BigIntegerField()
     price = models.FloatField()
     is_empty = models.BooleanField(default=True)
-    room_image = models.CharField(max_length=255)
+    room_image = models.FileField(upload_to="room_images/", blank=True, null=True, default='no_image/noimage.png')
     description = models.CharField(max_length=255)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
     top_ten=models.BooleanField(default=False)
@@ -91,3 +90,12 @@ class Rating(models.Model):
     def __str__(self):
         return f"Rating for {self.hotel.hotel_name}"
 
+
+
+class SiteAsset(models.Model):
+    logo = models.ImageField(upload_to='logos/', blank=True, null=True, default='no_image/noimage.png')
+    instagram_icon = models.ImageField(upload_to='social_media/', blank=True, null=True, default='no_image/noimage.png')
+    twitter_icon = models.ImageField(upload_to='social_media/', blank=True, null=True, default='no_image/noimage.png')
+
+    def __str__(self):
+        return "Site Assets"
