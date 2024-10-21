@@ -9,13 +9,6 @@ class AdsSlide(models.Model):
     def __str__(self):
         return self.title
 
-class Logo(models.Model):
-    title = models.CharField(max_length=255)
-    logo_image = models.FileField(upload_to="logo_image" ,blank=True, null=True,  default='no_image/noimage.png')
-    def __str__(self):
-        return self.title
-
-
 
 class Role(models.Model):
     role_name = models.CharField(max_length=255)
