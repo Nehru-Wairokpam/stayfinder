@@ -17,4 +17,13 @@ def home(request):
         "top_ten_room_list":top_ten_room_list,
      
     }
-    return render(request, 'base.html',context)
+    return render(request, 'home.html',context)
+
+
+def topTenRoomList(request):
+    top_ten_room_list = Room.objects.all().filter(top_ten=True)
+     
+    context={
+        "top_ten_room_list":top_ten_room_list,
+    }
+    return render(request, 'topTenRoomList.html',context)

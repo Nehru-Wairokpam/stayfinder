@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        {% for room in top_ten_room_list %}
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card">
+                    <img class="card-img-top p-2 rounded-top-circle" src="{{ room.room_image.url }}" alt="Hotel Room" style="height: 200px; object-fit: cover;">
+                    <div class="card-body" style="height: 300px;">
+                        <h5 class="card-title">{{ room.hotel }}</h5>
+                        <div class="room-details">
+                            <p class="card-text"><strong>Room No:</strong> {{ room.room_number }}</p>
+                            <p class="card-text"><strong>Price:</strong> ₹{{ room.price }}</p>
+                            <p class="card-text"><strong>Capacity:</strong> {{ room.capacity }} persons</p>
+                            <p class="card-text description" style="display: -webkit-box; 
+                            -webkit-line-clamp: 4;                                   
+                            -webkit-box-orient: vertical; 
+                            overflow: hidden; 
+                            text-overflow: ellipsis;">
+                        <strong>Description:</strong> {{ room.description }}
+                        </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No top ten rooms available.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
