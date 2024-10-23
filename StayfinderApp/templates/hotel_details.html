@@ -2,14 +2,47 @@
 
 {% block content %}
 
-<div class="row">
-    <h2 class="text-center">Available Details</h2>
 
-    <h3 class="text-center" >{{hotel_details.hotel_name }} </h3>
+    <h2 class="text-center mt-3 mb-4" >{{hotel_details.hotel_name }}</h2>
+
+
+<section title="Hotel Details">
+    <div class="row">
+
+        <div class="col-sm-6 col-md-6 col-lg-6" >
+            <div class="row">
+                <div class="col-sm-6 col-md-6 col-lg-6 " >
+
+                    <img src="{{hotel_details.hotel_banner.url}}" style="width: 100%;">
+                </div>
+
+                <div class="col-md-6" >
+
+                    <img src="{{hotel_details.interior_image.url}}" style="width: 100%;">
+                </div>
+            </div>
+             
+        </div>
+
+        <div class="col-sm-6 col-md-6 col-lg-6 " >
+            <h5 class="text-center" >{{hotel_details.hotel_name }}</h5>
+            <h5 class=" text-center" >{{hotel_details.location }}</h5>
+                    
+
+        </div>
+
+    </div>
+
+</section>
+<hr/>
+<section title="Rooms">
+    <div class="row mt-3">
+    <h3> Rooms</h3>
+    {% if room_list  %}
     {% for room in room_list %}
 
       <div class="col-sm-6 col-md-3 col-lg-3 mb-3 mb-2">
-      <a href="/hotel_details/?hotel=2">
+      <a href="/room_details/?room={{room.id}}">
         <div class="card">
           <img src="{{room.room_image.url }}" class="card-img-top" alt="..." />
           <div class="card-body">
@@ -20,8 +53,15 @@
       </a>
 
       </div>
-
-
     {% endfor %}
-  </div>
+
+    {% else %}
+    <div> 
+      <h5 style="color:red; text-align: center;"> Rooms not available!</h5>
+    </div>
+    {% endif %}
+</div>
+
+</section>
+
 {% endblock %}
