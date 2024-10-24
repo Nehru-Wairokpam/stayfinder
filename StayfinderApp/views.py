@@ -57,3 +57,29 @@ def room_details(request):
      
         }
     return render(request, 'room_details.html',context)
+
+
+def search(request):
+
+    if request.method == 'POST':
+        query= request.POST.get("search_query")
+
+    
+        hotel_lists = Hotel.objects.filter(hotel_name__icontains=query)
+
+        context = {
+            "hotel_lists":hotel_lists,
+            "is_search":True
+        }
+
+    
+        return render(request, 'hotels.html', context)
+    else:
+        context = {
+            "error":"Invalid Reequest"
+        }
+        return render(request, 'hotels.html', context)
+
+
+
+
