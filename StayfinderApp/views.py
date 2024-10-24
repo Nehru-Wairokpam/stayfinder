@@ -17,6 +17,8 @@ def home(request):
     }
     return render(request, 'home.html',context)
 
+
+
 def hotels(request):
     
     hotel_lists = Hotel.objects.all()
@@ -27,6 +29,8 @@ def hotels(request):
 
     
     return render(request, 'hotels.html', context)
+
+
 
 def hotel_details(request):
     hotel_id= request.GET["hotel"]
