@@ -33,10 +33,14 @@ def hotels(request):
 
 
 def hotel_details(request):
+
     hotel_id= request.GET["hotel"]
 
+    price= request.GET["price"]
+
     hotel_details=Hotel.objects.filter(pk=hotel_id)[0]
-    room_list=Room.objects.filter(hotel=hotel_details)
+
+    room_list=Room.objects.filter(hotel=hotel_details, price__lt=price)
 
     context={
         "hotel_details":hotel_details,
