@@ -35,20 +35,42 @@ def hotels(request):
 def hotel_details(request):
 
     hotel_id= request.GET["hotel"]
-
-    price= request.GET["price"]
-
     hotel_details=Hotel.objects.filter(pk=hotel_id)[0]
+    room_list=Room.objects.filter(hotel=hotel_details)
+    is_filter =False
+    price=0
+    capacity=1
+    
 
-    room_list=Room.objects.filter(hotel=hotel_details, price__lt=price)
+    try: 
+        price= request.GET["price"]
+        room_list=Room.objects.filter(hotel=hotel_details, price__lt=price)
+        is_filter=True
+        price=price
+    except:
+        pass
+
+    try: 
+        capacity= request.GET["capacity"]
+        room_list=Room.objects.filter(hotel=hotel_details, capacity=int(capacity))
+        is_filter=True
+        capacity=capacity
+
+    except:
+        pass
 
     context={
         "hotel_details":hotel_details,
         "room_list":room_list,
+        'is_filter':is_filter,
+        'price':price,
+        'capacity':capacity
+
 
         
         }
     return render(request, 'hotel_details.html',context)
+
 
 
 

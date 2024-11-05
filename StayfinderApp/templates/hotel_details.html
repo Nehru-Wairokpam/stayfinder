@@ -19,10 +19,11 @@
       background-color: white;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+       margin: 5px;
   }
 
   .price-label {
-      font-size: 1.2em;
+      font-size: 0.7rem;
       margin-bottom: 15px;
       color: #333;
   }
@@ -159,33 +160,73 @@
     <section title="Rooms" class="mt-4">
       <h3 class="text-center">Available Rooms</h3>
 
-<!-- PRICE FILTER -->
 
-   
-      <div class="price-range-container">
+  <div style="display:  flex;  ">
+
+<!-- PRICE FILTER -->
+  
+      <div class="price-range-container ">
         <div class="price-label">Select Price Range:</div>
         <!-- <div class="price-display" id="priceDisplay"></div> -->
-        <input type="range" id="priceRange" min="0" max="10000" value="500" step="10" oninput="updatePriceDisplay(this.value)">
+        <input type="range" id="priceRange" min="0" max="10000" value="0" step="10" oninput="updatePriceDisplay(this.value)">
         
-        <span id="priceDisplay"> Rs.50 </span>
+        <span id="priceDisplay"> Rs.0 </span>
     <button class="btn btn-outline-primary" onclick="price_filter()"> Filter</button>
       </div>
 
-      <script>
-        function updatePriceDisplay(value) {
-            document.getElementById('priceDisplay').textContent = 'Rs. ' + `${value}`;
-        }
-
-        function price_filter(){
-          alert("ncbd")
-          var selected_prcie=document.getElementById('priceRange').value
-          alert(selected_prcie)
-          window.location.href= '/hotel_details/?hotel={{hotel_details.id}}&price='+selected_prcie
-
-        }
-      </script>
 <!-- END of the PRICE FILTER SECTION -->
+    <!-- CAPACITY FILTER -->
+      
+    <div class="price-range-container ">
+      <div class="price-label">Select Room Capacity:</div>
+      <!-- <div class="price-display" id="priceDisplay"></div> -->
+    
+      <select id="capacity">
+        <option value="1">1</option>
+        <option value="2" >2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        
+      </select>
 
+    <button class="btn btn-outline-primary" onclick="capacity_filter()"> Filter</button>
+    </div>
+
+    <!-- END of the CAPACITY FILTER SECTION -->
+{% if is_filter %}
+    <button onclick="fiter_reset()"> Reset Filter </button>
+  {% endif %}
+</div>
+
+
+<script>
+  function updatePriceDisplay(value) {
+      document.getElementById('priceDisplay').textContent = 'Rs. ' + `${value}`;
+  }
+
+  function price_filter(){
+    // alert("ncbd")
+    var selected_prcie=document.getElementById('priceRange').value
+    // alert(selected_prcie)
+    window.location.href= '/hotel_details/?hotel={{hotel_details.id}}&price='+selected_prcie
+
+  }
+
+
+  function capacity_filter(){
+    // alert("ncbd")
+    var selected_capacity=document.getElementById('capacity').value
+    // alert(selected_capacity)
+    // alert(selected_prcie)
+    window.location.href= '/hotel_details/?hotel={{hotel_details.id}}&capacity='+selected_capacity
+
+  }
+
+  function fiter_reset(){
+    window.location.href= '/hotel_details/?hotel={{hotel_details.id}}';
+
+  }
+</script>
 
       <div class="row mt-3">
         {% if room_list %} {% for room in room_list %}
@@ -204,6 +245,7 @@
                 <h5 class="card-title text-center">
                   Room no: {{ room.room_number }}
                 </h5>
+                <h6>Rs. {{room.price}} </h6>
               </div>
             </div>
           </a>
