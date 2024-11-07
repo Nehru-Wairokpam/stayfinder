@@ -24,5 +24,11 @@ urlpatterns = static(settings.STATIC_ROOT, document_root=settings.STATIC_ROOT) +
     path('admin/', admin.site.urls),
     path('', views.home),
     path('toptenroomlist/', views.topTenRoomList,  name='topTenRoomList'),
+    path('pickedoftheday/', views.pickedoftheday,  name='pickedoftheday'),
+    path('hotel/', views.hotel,  name='hotel'),
+    path('hotelDetails/', views.hotel_Details),
+    path('roomDetails/', views.room_Details),
+    path('search/', views.search),
+
 ]
 

@@ -33,8 +33,12 @@ class Hotel(models.Model):
     longitude = models.CharField(max_length=50,blank=True, null=True )
     latitude = models.CharField(max_length=50 ,blank=True, null=True)
 
-    hotel_banner = models.FileField(upload_to="hotel_image" , blank=True, null=True, default='no_image/noimage.png')
-    interior_image = models.FileField(upload_to="hotel_image" ,blank=True, null=True,  default='no_image/noimage.png')
+    hotel_image = models.FileField(upload_to="hotel_image" , blank=True, null=True, default='no_image/noimage.png')
+    hotel_banner = models.FileField(upload_to="hotel_banner" , blank=True, null=True, default='no_image/noimage.png')
+    hotel_view1 = models.FileField(upload_to="hotel_view1" , blank=True, null=True, default='no_image/noimage.png')
+    hotel_view2 = models.FileField(upload_to="hotel_view2" , blank=True, null=True, default='no_image/noimage.png')
+    hotel_view3 = models.FileField(upload_to="hotel_view3" , blank=True, null=True, default='no_image/noimage.png')
+    room_view = models.FileField(upload_to="room_view" ,blank=True, null=True,  default='no_image/noimage.png')
 
     user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, related_name='hotels')
     phone_number = models.CharField(max_length=255)
@@ -49,13 +53,16 @@ class Room(models.Model):
     capacity = models.BigIntegerField()
     price = models.FloatField()
     is_empty = models.BooleanField(default=True)
-    room_image = models.FileField(upload_to="hotel_room" ,blank=True, null=True,  default='no_image/noimage.png')
+    room_image1 = models.FileField(upload_to="hotel_room" ,blank=True, null=True,  default='no_image/noimage.png')
+    room_image2 = models.FileField(upload_to="room_image2" ,blank=True, null=True,  default='no_image/noimage.png')
+    room_image3 = models.FileField(upload_to="room_image3" ,blank=True, null=True,  default='no_image/noimage.png')
     description = models.CharField(max_length=1000)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
     top_ten = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Room {self.room_number} at {self.hotel.hotel_name}"
+
 
 class Payment(models.Model):
     transaction_id = models.CharField(max_length=255)
