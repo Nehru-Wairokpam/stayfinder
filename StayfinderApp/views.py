@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from .models import AdsSlide, Hotel, Room
+from .models import AdsSlide, Hotel, Room, Role
 # Create your views here.
 
 def home(request):
@@ -106,6 +106,47 @@ def search(request):
         }
         return render(request, 'hotels.html', context)
 
+#signup
+def signup(request):
+    roles=Role.objects.all()
+
+    context={
+        "roles":roles
+       
+    }
+    return render(request, 'signup.html',context)
 
 
 
+def sinup_post(request):
+
+    if request.method == 'POST':
+
+        username=request.POST.get("username")
+        email=request.POST.get("email")
+        password=request.POST.get("password")
+        phone= request.POST.get("phone")
+        address=request.POST.get("address")
+        role= request.POST.get("role")
+
+        print(username)
+        print(email)
+        print(password)
+        print(phone)
+        print(address)
+        print(role)
+
+    
+       
+
+        context = {
+           
+        }
+
+    
+        return render()
+    else:
+        context = {
+            "error":"Invalid Reequest"
+        }
+        return render()
