@@ -45,17 +45,50 @@ def topTenRoomList(request):
     }
     return render(request, 'Home/topTenRoomList.html',context)
 
+
 def hotel_Details(request):
-    hotel_id= request.GET["hotel"]
+    # Use .get() for safe access to query parameters
+    hotel_id = request.GET.get("hotel")
+    price = request.GET.get("price")
+    capacity = request.GET.get("capacity", "1")  # Adding capacity as part of the filtering logic
 
-    hotelDetails=Hotel.objects.filter(pk=hotel_id)[0]
-    room_list=Room.objects.filter(hotel=hotel_id)
+    # Use .first() to fetch a single object or None, avoiding potential index errors
+    hotelDetails = Hotel.objects.filter(pk=hotel_id).first()
 
-    context={
-        "hotelDetails":hotelDetails,
-        "room_list":room_list,       
-        }
-    return render(request, 'HotelDetails/hotelDetails.html',context)
+    # Initialize room_list with the basic filter for the hotel
+    room_list = Room.objects.filter(hotel=hotelDetails)
+    is_filter = False  # To track if filters were applied
+
+    # Apply price filter if provided
+    if price:
+        try:
+            price = float(price)  # Convert to float if price is a numeric field
+            room_list = room_list.filter(price__lte=price)
+            is_filter = True
+        except ValueError:
+            pass  # Ignore invalid price input
+
+    # Apply capacity filter if provided
+    if capacity:
+        try:
+            capacity = int(capacity)  # Convert to integer for capacity filtering
+            room_list = room_list.filter(capacity=capacity)
+            is_filter = True
+        except ValueError:
+            pass  # Ignore invalid capacity input
+
+    # Prepare context for rendering
+    context = {
+        "hotelDetails": hotelDetails,
+        "room_list": room_list,
+        "is_filter": is_filter,
+        "price": price if price else "",  # Ensure the form can show the selected price
+        "capacity": capacity if capacity else "1",  # Ensure the form can show the selected capacity
+    }
+
+    return render(request, 'HotelDetails/hotelDetails.html', context)
+
+
 
 
 def room_Details(request):
