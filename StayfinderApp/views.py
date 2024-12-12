@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
-from .models import AdsSlide, Hotel, Role, Room
+from .models import AdsSlide, Hotel, Role, Room,UserRole
 # Create your views here.
 
 def home(request):
@@ -150,15 +150,22 @@ def signup_post(request):
         confirm_password = request.POST['confirmPassword']
         phone = request.POST['phone']
         address = request.POST['address']
-        role = request.POST['role']
+        role = request.POST['role'] #id
+
+        user = User.objects.create_user(username=full_name,email=email,password=password)
+        if role == '1':
+            user_role=UserRole.objects.create(user=user,role_id=int(role),user_name=full_name, phone=phone,address=address, is_activate=True)
+        if role == '2':
+            user_role=UserRole.objects.create(user=user,role_id=int(role),user_name=full_name, phone=phone,address=address, is_activate=False)
+
 
         context = {
          
-     }
+        }
         
-        return render()
+        return redirect('/login')
     else:
         context = {
             "error": "Invalid Request"
         }
-        return render()
+        return redirect('/signUp')
