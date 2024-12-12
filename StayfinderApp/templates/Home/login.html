@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg rounded-4">
+                <div class="card-header text-center" style="background: linear-gradient(135deg, #438682, #7ebdba); color: white;">
+                    <h4>Login</h4>
+                </div>
+                <div class="card-body">
+                    {% csrf_token %}
+                    <form action="{% url 'login_post' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-lg" style="background-color: #438682; color: white;">Login</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <small>Don't have an account? <a href="/signUp" class="text-primary">Register</a></small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

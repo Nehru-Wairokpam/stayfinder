@@ -1,6 +1,9 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render
 
-from .models import AdsSlide, Hotel, Room
+from .models import AdsSlide, Hotel, Role, Room
 # Create your views here.
 
 def home(request):
@@ -47,46 +50,47 @@ def topTenRoomList(request):
 
 
 def hotel_Details(request):
-    # Use .get() for safe access to query parameters
+    # Fetch query parameters
     hotel_id = request.GET.get("hotel")
     price = request.GET.get("price")
-    capacity = request.GET.get("capacity", "1")  # Adding capacity as part of the filtering logic
+    capacity = request.GET.get("capacity")
 
-    # Use .first() to fetch a single object or None, avoiding potential index errors
+    # Retrieve the hotel details safely
     hotelDetails = Hotel.objects.filter(pk=hotel_id).first()
 
-    # Initialize room_list with the basic filter for the hotel
+    # Initialize the room list with all rooms for the selected hotel
     room_list = Room.objects.filter(hotel=hotelDetails)
-    is_filter = False  # To track if filters were applied
+    is_filter = False  # Track if any filter was applied
 
     # Apply price filter if provided
     if price:
         try:
-            price = float(price)  # Convert to float if price is a numeric field
+            price = float(price)  # Ensure `price` is a float for numeric comparison
             room_list = room_list.filter(price__lte=price)
             is_filter = True
         except ValueError:
-            pass  # Ignore invalid price input
+            price = None  # Reset to None if invalid input is provided
 
     # Apply capacity filter if provided
     if capacity:
         try:
-            capacity = int(capacity)  # Convert to integer for capacity filtering
+            capacity = int(capacity)  # Ensure `capacity` is an integer
             room_list = room_list.filter(capacity=capacity)
             is_filter = True
         except ValueError:
-            pass  # Ignore invalid capacity input
+            capacity = None  # Reset to None if invalid input is provided
 
     # Prepare context for rendering
     context = {
         "hotelDetails": hotelDetails,
         "room_list": room_list,
-        "is_filter": is_filter,
-        "price": price if price else "",  # Ensure the form can show the selected price
-        "capacity": capacity if capacity else "1",  # Ensure the form can show the selected capacity
+        "is_filter": is_filter,  # Indicate if any filters are active
+        "price": price if price is not None else "",  # Pass the selected price for form pre-fill
+        "capacity": capacity if capacity is not None else "",  # Pass the selected capacity for form pre-fill
     }
 
     return render(request, 'HotelDetails/hotelDetails.html', context)
+
 
 
 
@@ -117,5 +121,44 @@ def search(request):
             "error":"Invalid Request"
         }
         return render(request, 'Home/hotel.html', context)
+    
+def login(request):
+        return render(request, 'Home/login.html')
+
+def login_post(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
 
 
+    
+def signUp(request):
+        roles=Role.objects.all()
+
+        context={
+            "roles":roles
+      
+        }
+        return render(request, 'Home/signUp.html',context)
+
+
+def signup_post(request):
+    if request.method == 'POST':
+        full_name = request.POST['fullName']
+        email = request.POST['email']
+        password = request.POST['password']
+        confirm_password = request.POST['confirmPassword']
+        phone = request.POST['phone']
+        address = request.POST['address']
+        role = request.POST['role']
+
+        context = {
+         
+     }
+        
+        return render()
+    else:
+        context = {
+            "error": "Invalid Request"
+        }
+        return render()
