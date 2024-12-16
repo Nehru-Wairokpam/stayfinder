@@ -10,7 +10,7 @@
                 </div>
                 <div class="card-body">
                   {% csrf_token %} 
-                    <form action="{% url 'signup_post' %}" method="POST">
+                    <form action="{% url 'signup_post' %}" method="POST" id="signupForm">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="fullName" class="form-label">Full Name</label>
@@ -30,11 +30,13 @@
                         <div class="mb-3">
                             <label for="confirmPassword" class="form-label">Confirm Password</label>
                             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                            <small id="passwordError" class="text-danger" style="display: none;">Passwords do not match!</small>
                         </div>
 
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone Number</label>
                             <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
+                            <small id="phoneError" class="text-danger" style="display: none;">Phone number must be exactly 10 digits!</small>
                         </div>
 
                         <div class="mb-3">
@@ -60,4 +62,39 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('signupForm').addEventListener('submit', function(event) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const phone = document.getElementById('phone').value;
+
+        const passwordError = document.getElementById('passwordError');
+        const phoneError = document.getElementById('phoneError');
+
+        let isValid = true;
+
+        // Validate password match
+        if (password !== confirmPassword) {
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else {
+            passwordError.style.display = 'none';
+        }
+
+        // Validate phone number length
+        if (phone.length !== 10) {
+            phoneError.style.display = 'block';
+            isValid = false;
+        } else {
+            phoneError.style.display = 'none';
+        }
+
+        // Prevent form submission if validation fails
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+</script>
+
 {% endblock %}
