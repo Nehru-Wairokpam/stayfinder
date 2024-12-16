@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login 
+from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
-
 from .models import AdsSlide, Hotel, Role, Room,UserRole
 # Create your views here.
 
@@ -127,8 +127,26 @@ def login(request):
 
 def login_post(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
+        try:
+            email = request.POST['email']
+            password = request.POST['password']
+            print(email)
+            print(password)
+            if User.objects.filter(email=email).exists():
+                user = authenticate(request, username=User.objects.get(email=email).username, password=password)
+                print(user)
+                if user is not None:
+                    # login(user)
+                    auth_login(request, user)
+                    return redirect('/')
+                else:
+                    print("Wrong Credential")
+
+            else:
+                print("Wrong Credential")
+
+        except Exception as e:
+            print("error----"+str(e))
 
 
     

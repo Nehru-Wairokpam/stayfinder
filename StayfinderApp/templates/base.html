@@ -58,8 +58,12 @@
                     </li>
                 </ul>
                 <div>
+                    {% if request.user.is_authenticated %}
+                    <h3> {{request.user.email}}</h3>
+                    {% else %}
                     <a href="/login" class="btn text-black" style="background-color: #7ebdba;">Log in & Register</a>
-                    <button class="btn" style="background-color: #7ebdba;">Book Now</button>
+                    {% endif %}
+                    <!-- <button class="btn" style="background-color: #7ebdba;">Book Now</button> -->
                 </div>
                
             </div>
