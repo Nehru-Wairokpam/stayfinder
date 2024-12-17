@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login 
+from django.contrib.auth import authenticate, logout 
 from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
 from .models import AdsSlide, Hotel, Role, Room,UserRole
@@ -125,13 +125,15 @@ def search(request):
 def login(request):
         return render(request, 'Home/login.html')
 
+
+
 def login_post(request):
     if request.method == 'POST':
         try:
             email = request.POST['email']
             password = request.POST['password']
-            print(email)
-            print(password)
+            # print(email)
+            # print(password)
             if User.objects.filter(email=email).exists():
                 user = authenticate(request, username=User.objects.get(email=email).username, password=password)
                 print(user)
@@ -140,13 +142,23 @@ def login_post(request):
                     auth_login(request, user)
                     return redirect('/')
                 else:
-                    print("Wrong Credential")
+                    context={
+                        "status":"Error"
+                    }
+                    return render(request, 'Home/login.html')
+                    
 
             else:
-                print("Wrong Credential")
+                context={
+                        "status":"Error"
+                    }
+                return render(request, 'Home/login.html', context)
 
         except Exception as e:
-            print("error----"+str(e))
+            context={
+                        "status":"Error"
+                    }
+            return render(request, 'Home/login.html',context)
 
 
     
@@ -187,3 +199,9 @@ def signup_post(request):
             "error": "Invalid Request"
         }
         return redirect('/signUp')
+
+
+    
+def Logout(request):
+        logout(request)
+        return redirect('/')

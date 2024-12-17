@@ -8,6 +8,7 @@
                 <div class="card-header text-center" style="background: linear-gradient(135deg, #438682, #7ebdba); color: white;">
                     <h4>Login</h4>
                 </div>
+                <h3  id="error" style="color: red; display: none; text-align: center;"> Invalid email and password! </h3>
                 <div class="card-body">
                     {% csrf_token %}
                     <form action="{% url 'login_post' %}" method="POST">
@@ -35,4 +36,13 @@
         </div>
     </div>
 </div>
+
+
+{% if status == "Error" %}
+<script>
+ document.getElementById('error').style.display="block";
+</script>
+{% endif %}
+
+
 {% endblock %}

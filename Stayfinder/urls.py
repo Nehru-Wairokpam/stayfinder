@@ -33,6 +33,7 @@ urlpatterns = static(settings.STATIC_ROOT, document_root=settings.STATIC_ROOT) +
     path('signup_post/', views.signup_post, name='signup_post'),
     path('login', views.login, name='login'),
     path('login_post/', views.login_post, name='login_post'),
+    path('logout/', views.Logout, name='logout'),
 
 ]
 
