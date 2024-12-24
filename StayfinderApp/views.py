@@ -220,3 +220,31 @@ def profile_view(request):
 
     # Pass profile data to the template
     return render(request, 'profile.html', {'profile': profile, 'roles': roles})
+
+
+# Example date string
+from datetime import datetime
+date_format = "%Y-%m-%d"
+
+# Convert string to date object (we ignore time)
+@login_required
+def Booking(request):
+    if request.method == 'POST':
+        room_id = request.POST['room_id']
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
+
+
+        n_o_d= date_object = datetime.strptime(end_date, date_format).date() - datetime.strptime(start_date, date_format).date()
+
+        s_d=start_date + ' 12:00:00+00:00'
+        e_d=end_date + ' 12:00:00+00:00'
+        print("n_o_d:")
+        print(n_o_d)
+        context = {
+        
+        }
+        return redirect('/')
+    
+
+ 

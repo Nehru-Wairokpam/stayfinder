@@ -35,6 +35,7 @@ urlpatterns = static(settings.STATIC_ROOT, document_root=settings.STATIC_ROOT) +
     path('login_post/', views.login_post, name='login_post'),
     path('logout', views.Logout, name='logout'),
     path('profile/', views.profile_view, name='profile'),  # Profile display
+    path('booking/', views.Booking, name='booking'),  # Profile display
     # path('profile/update/', views.profile_update, name='profile_update'),  # Profile update
 
 ]
