@@ -1,9 +1,14 @@
+from profile import Profile
 from django.contrib import messages
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, logout 
+from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
 
-from .models import AdsSlide, Hotel, Role, Room
+from .models import AdsSlide, Hotel, Role, Room, UserRole
 # Create your views here.
 
 def home(request):
@@ -121,14 +126,44 @@ def search(request):
             "error":"Invalid Request"
         }
         return render(request, 'Home/hotel.html', context)
-    
+
 def login(request):
         return render(request, 'Home/login.html')
 
+    
+    
 def login_post(request):
-    if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
+     if request.method == 'POST':
+        try:
+            email = request.POST['email']
+            password = request.POST['password']
+            # print(email)
+            # print(password)
+            if User.objects.filter(email=email).exists():
+                user = authenticate(request, username=User.objects.get(email=email).username, password=password)
+                print(user)
+                if user is not None:
+                    # login(user)
+                    auth_login(request, user)
+                    return redirect('/')
+                else:
+                    context={
+                        "status":"Error"
+                    }
+                    return render(request, 'Home/login.html')
+                    
+
+            else:
+                context={
+                        "status":"Error"
+                    }
+                return render(request, 'Home/login.html', context)
+
+        except Exception as e:
+            context={
+                        "status":"Error"
+                    }
+            return render(request, 'Home/login.html',context)
 
 
     
@@ -150,15 +185,38 @@ def signup_post(request):
         confirm_password = request.POST['confirmPassword']
         phone = request.POST['phone']
         address = request.POST['address']
-        role = request.POST['role']
+        role = request.POST['role'] #id
+
+        user = User.objects.create_user(username=full_name,email=email,password=password)
+        if role == '1':
+            user_role=UserRole.objects.create(user=user,role_id=int(role),user_name=full_name, phone=phone,address=address, is_activate=True)
+        if role == '2':
+            user_role=UserRole.objects.create(user=user,role_id=int(role),user_name=full_name, phone=phone,address=address, is_activate=False)
+
 
         context = {
          
-     }
+        }
         
-        return render()
+        return redirect('/login')
     else:
         context = {
             "error": "Invalid Request"
         }
-        return render()
+        return redirect('/signUp')
+
+
+    
+def Logout(request):
+        logout(request)
+        return redirect('/')
+
+@login_required
+def profile_view(request):
+    # Get or create profile for the logged-in user
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    roles = Role.objects.all()  # Assuming you have a Role model
+
+    # Pass profile data to the template
+    return render(request, 'profile.html', {'profile': profile, 'roles': roles})

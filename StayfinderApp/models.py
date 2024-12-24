@@ -96,3 +96,5 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"Rating for {self.hotel.hotel_name}"
+    
+
