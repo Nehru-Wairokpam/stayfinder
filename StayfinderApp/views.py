@@ -8,7 +8,7 @@ from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 
-from .models import AdsSlide, Hotel, Role, Room, UserRole
+from .models import AdsSlide, Hotel, Role, Room, UserRole,Booked,Payment
 # Create your views here.
 
 def home(request):
@@ -235,16 +235,25 @@ def Booking(request):
         end_date = request.POST['end_date']
 
 
-        n_o_d= date_object = datetime.strptime(end_date, date_format).date() - datetime.strptime(start_date, date_format).date()
+        n_o_d =  datetime.strptime(end_date, date_format).date() - datetime.strptime(start_date, date_format).date()
 
         s_d=start_date + ' 12:00:00+00:00'
         e_d=end_date + ' 12:00:00+00:00'
-        print("n_o_d:")
-        print(n_o_d)
+
+        number_of_days=int((str(n_o_d).split(',')[0].split(' ')[0]))+1
+
+        user_role=UserRole.objects.get(user=request.user)
+        payment=Payment.objects.all()[0]
+        Booked.objects.create(number_of_days=number_of_days,start_date=s_d,end_date=e_d,user_role=user_role,room_id=room_id,payment=payment)
         context = {
         
         }
         return redirect('/')
     
+
+   
+
+   
+
 
  
