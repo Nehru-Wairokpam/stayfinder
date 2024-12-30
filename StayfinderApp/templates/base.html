@@ -68,14 +68,17 @@
                                 <i class="fas fa-user me-2"></i>
                                 {{ request.user.username|slice:":2" }}
                             </button>
-                            <ul class="dropdown-menu text-center" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li> <!-- Use URL name -->
-                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                            </ul>
+                            <div>
+                                <ul class="dropdown-menu text-start" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item"  href="{% url 'profile' %}">Profile</a></li> <!-- Use URL name -->
+                                    <li><a class="dropdown-item"  href="/logout">Logout</a></li>
+                                </ul>
+                            </div>
+                            
                         </div>
                     {% else %}
                         <!-- Log in and Register button -->
-                        <a href="/login" class="btn text-black" style="background-color: #7ebdba;">Log in & Register</a>
+                        <a href="/login" class="btn text-black" style="background-color: #7ebdba;">Login & Register</a>
                     {% endif %}
                 </div>
                

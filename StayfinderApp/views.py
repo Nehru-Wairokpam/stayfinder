@@ -5,10 +5,10 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout 
 from django.contrib.auth import login as auth_login
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 
-from .models import AdsSlide, Hotel, Role, Room, UserRole
+from .models import AdsSlide, Hotel, Role, Room, UserRole, Booked,Payment
 # Create your views here.
 
 def home(request):
@@ -106,6 +106,7 @@ def room_Details(request):
 
     context={
         "room_List":room_List
+
     }
     return render(request, 'HotelDetails/roomDetails.html', context)
 
@@ -220,3 +221,109 @@ def profile_view(request):
 
     # Pass profile data to the template
     return render(request, 'profile.html', {'profile': profile, 'roles': roles})
+
+
+from datetime import datetime
+date_format = "%Y-%m-%d"
+
+@login_required
+def Booking(request):
+    room_id = request.GET.get("room_id")  # Get room ID from the URL or form
+    hotel_id = request.GET.get("hotel")  # Get hotel ID for hotel details
+    is_booked = False
+    start_date, end_date, number_of_days = None, None, None
+
+    # Fetch hotel details if hotel_id is provided
+    hotelDetails = get_object_or_404(Hotel, pk=hotel_id) if hotel_id else None
+
+    # Check if the room is already booked
+    if room_id:
+        booked_room = Booked.objects.filter(room_id=room_id).first()
+        if booked_room:
+            is_booked = True
+            start_date = booked_room.start_date
+            end_date = booked_room.end_date
+            number_of_days = booked_room.number_of_days
+        else:
+            is_booked = False
+
+    # Handle POST request
+    if request.method == 'POST':
+        try:
+            # Extract POST data
+            room_id = request.POST.get('room_id')
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+
+            # Ensure required fields are provided
+            if not room_id or not start_date or not end_date:
+                raise ValueError("All fields are required.")
+
+            # Parse dates and calculate the number of days
+            date_format = "%Y-%m-%d"
+            start_date_obj = datetime.strptime(start_date, date_format)
+            end_date_obj = datetime.strptime(end_date, date_format)
+
+            if start_date_obj >= end_date_obj:
+                raise ValueError("End date must be after start date.")
+
+            n_o_d = end_date_obj - start_date_obj
+            number_of_days = n_o_d.days + 1  # Include the end date
+
+            # Convert dates to datetime format for database
+            s_d = start_date_obj.strftime("%Y-%m-%d 12:00:00+00:00")
+            e_d = end_date_obj.strftime("%Y-%m-%d 12:00:00+00:00")
+
+            # Get user role and payment details
+            user_role = UserRole.objects.get(user=request.user)
+            payment = Payment.objects.first()  # Assuming the first payment record is used
+
+            # Create booking
+            Booked.objects.create(
+                number_of_days=number_of_days,
+                start_date=s_d,
+                end_date=e_d,
+                user_role=user_role,
+                room_id=room_id,
+                payment=payment
+            )
+            is_booked = True
+
+            # Add a success message
+            messages.success(request, "Room booked successfully!")
+            # Redirect on success
+            return redirect('/')
+
+        except ValueError as e:
+            # Handle validation errors
+            context = {
+                "hotelDetails": hotelDetails,
+                "is_booked": is_booked,
+                "start_date": start_date,
+                "end_date": end_date,
+                "number_of_days": number_of_days,
+                "error": str(e),
+            }
+            return render(request, "HotelDetails/roomDetails.html", context)
+
+        except Exception as e:
+            # Handle unexpected errors
+            context = {
+                "hotelDetails": hotelDetails,
+                "is_booked": is_booked,
+                "start_date": start_date,
+                "end_date": end_date,
+                "number_of_days": number_of_days,
+                "error": "An unexpected error occurred. Please try again.",
+            }
+            return render(request, "HotelDetails/roomDetails.html", context)
+
+    # Render the booking page for GET requests
+    context = {
+        "hotelDetails": hotelDetails,
+        "is_booked": is_booked,
+        "start_date": start_date,
+        "end_date": end_date,
+        "number_of_days": number_of_days,
+    }
+    return render(request, "", context)

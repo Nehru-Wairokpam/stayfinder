@@ -2,7 +2,45 @@
 
 {% block content %}
 
-
+{%  block css %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    form {
+        max-width: 300px;
+        margin: 20px auto;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    input[type="date"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+</style>
+    
+{% endblock  %}
 
     <h2 class="text-center mt-3 mb-5" >Room No. {{room_List.room_number }}</h2>
 
@@ -45,7 +83,9 @@
                     <p class="text-left"><strong>Capacity:</strong> {{room_List.capacity}}</p>
                     <p class="text-left"><strong>Price:</strong> ₹{{room_List.price}}/-</p>
                     <p class="text-left"><strong>Description:</strong> {{room_List.description}}</p>
-                    <button class="btn btn-outline-primary mt-5">Book Now</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        Book Now
+                      </button>
                 </div>
             </div>
         </div>
@@ -53,5 +93,131 @@
 
 </section>
 
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Confirm Your Reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <form id="/booking/" method="post">
+                        {% csrf_token %}
+
+                                <!-- Display Room Booking Details if already booked -->
+                                {% if error %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                                {% endif %}
+                                
+                                {% if is_booked %}
+                                <h3>Room Booking Details</h3>
+                                <p><strong>Start Date:</strong> {{ start_date }}</p>
+                                <p><strong>End Date:</strong> {{ end_date }}</p>
+                                <p><strong>Number of Days:</strong> {{ number_of_days }}</p>
+                                {% else %}
+                                <p><strong>Status:</strong> This room is not booked yet.</p>
+                                {% endif %}
+                        <input type="hidden" id="room_id" value="{{ room_List.id }}" name="room_id">
+                        
+                        <!-- Display Start Date and End Date Inputs -->
+                        <label for="start-date">Start Date:</label>
+                        <input type="date" id="start-date" name="start_date" required>
+                
+                        <label for="end-date">End Date:</label>
+                        <input type="date" id="end-date" name="end_date" required>
+                
+                
+                        <!-- Next Button to move to the second step -->
+                        <button type="button" id="next-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal" disabled>Next</button>
+                    </form>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirm Your Reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/booking/" method="post">
+                    {% csrf_token %}
+                    <h3>Confirm Your Booking</h3>
+
+                    <!-- <p><strong>Hotel Name:</strong> {{ hotelDetails.hotel_name }}</p> -->
+                    <p><strong>Start Date:</strong> <span id="confirm-start-date"></span></p>
+                    <p><strong>End Date:</strong> <span id="confirm-end-date"></span></p>
+                    <p><strong>Number of Days:</strong> <span id="confirm-number-of-days"></span> days</p>
+                    <p><strong>Total Price:</strong> <span id="confirm-total-price"></span> /-</p>
+
+                    <!-- Pass hidden fields to retain the data -->
+                    <input type="hidden" name="room_id" id="room_id_confirmation">
+                    <input type="hidden" name="start_date" id="start_date_confirmation">
+                    <input type="hidden" name="end_date" id="end_date_confirmation">
+                    <input type="hidden" name="number_of_days" id="number_of_days_confirmation">
+                    
+                    <button type="submit">Book Now</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to check if both dates are selected
+    function checkDates() {
+        var startDate = document.getElementById('start-date').value;
+        var endDate = document.getElementById('end-date').value;
+        var nextButton = document.getElementById('next-button');
+
+        // Enable the "Next" button if both dates are selected
+        if (startDate && endDate) {
+            nextButton.disabled = false;
+        } else {
+            nextButton.disabled = true;
+        }
+    }
+
+    // Listen for changes on the start date and end date inputs
+    document.getElementById('start-date').addEventListener('input', checkDates);
+    document.getElementById('end-date').addEventListener('input', checkDates);
+
+    // Handle "Next" button click to transfer data to the confirmation modal
+    document.getElementById('next-button').addEventListener('click', function() {
+        // Get values from the first form
+        var roomId = document.getElementById('room_id').value;
+        var startDate = document.getElementById('start-date').value;
+        var endDate = document.getElementById('end-date').value;
+
+        // Calculate the number of days
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+        var numberOfDays = (end - start) / (1000 * 3600 * 24) + 1; // Add 1 to include the end date
+
+        // Calculate total price (replace this with your actual calculation logic)
+        var pricePerDay = {{ room_List.price }}; // Assuming you get price from the room object
+        var totalPrice = pricePerDay * numberOfDays;
+
+        // Update confirmation modal with the data
+        document.getElementById('confirm-start-date').innerText = startDate;
+        document.getElementById('confirm-end-date').innerText = endDate;
+        document.getElementById('confirm-number-of-days').innerText = numberOfDays;
+        document.getElementById('confirm-total-price').innerText = totalPrice;
+
+        // Pass hidden inputs to retain the data when confirming the booking
+        document.getElementById('room_id_confirmation').value = roomId;
+        document.getElementById('start_date_confirmation').value = startDate;
+        document.getElementById('end_date_confirmation').value = endDate;
+        document.getElementById('number_of_days_confirmation').value = numberOfDays;
+        document.getElementById('total_price_confirmation').value = totalPrice;
+    });
+</script>
 
 {% endblock %}
