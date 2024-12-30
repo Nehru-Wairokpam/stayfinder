@@ -105,10 +105,29 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+          <h5 class="modal-title" id="staticBackdropLabel">Initaite Booking</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+
+            {% if  booked_list %}
+            <p>
+                Booked on given Dates
+           </p>
+    <ul>
+        {% for list in booked_list %}
+        <li>
+            {{list.start_date}} -to- {{list.end_date}}
+        </li>
+    
+        {% endfor %}
+    </ul>
+        {% else %}
+        <p>
+             Available
+        </p>
+
+            {% endif %}
             <form action="/booking/" method="post">
 
                 {% csrf_token %} 
@@ -120,16 +139,70 @@
                 <label for="end-date">End Date:</label>
                 <input type="date" id="end-date" name="end_date" required>
                 
-                <button type="submit">Submit</button>
+                <button type="submit">Next</button>
             </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Understood</button>
+          <!-- <button type="button" class="btn btn-primary">Understood</button> -->
         </div>
       </div>
     </div>
   </div>
+
+<!-- confirmation booking -->
+ {% if booking_start %}
+ <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Booking Confirmation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+         
+
+
+        
+            <form action="/booking/" method="post">
+
+                {% csrf_token %} 
+                <label for="no_d">No. of days: </label>
+        
+             <input style="width: 8%; border: none;" type="text" name="number_of_days" value="{{number_of_days}}" readonly>  <span> Days</span>
+             <label for="amt">Total Amount: </label>
+             <input style="width: 19%; border: none;" type="text" name="total_amount" value="{{total_amount}}" readonly>  <span> Rupees.</span>
+             <label for="s_d">Start Date: </label>
+
+             <input type="text"  name="s_d" value="{{s_d}}" readonly>  
+             <label for="e_d">End Date: </label>
+
+             <input type="text" name="e_d" value="{{e_d}}" readonly>  
+             <input type="text"  style="visibility: hidden;" name="room_id" value="{{room_id}}" >  
+                
+                <button type="submit">Confirm now</button>
+            </form>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+      // Trigger the modal programmatically
+      myModal.show();
+    });
+  </script>
+  
+ {% endif %}
+
+
   <script>
     // Disable past dates
     const today = new Date().toISOString().split('T')[0];

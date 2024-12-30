@@ -104,10 +104,16 @@ def room_Details(request):
     room_id = request.GET["room"]
     room_List = Room.objects.filter(pk=room_id)[0]
 
+    booked_list=Booked.objects.filter(room_id=room_id)
+    print(booked_list)
+
     context={
-        "room_List":room_List
+        "room_List":room_List,
+        "booked_list":booked_list
     }
     return render(request, 'HotelDetails/roomDetails.html', context)
+
+
 
 def search(request):
     if request.method == 'POST':
@@ -244,11 +250,27 @@ def Booking(request):
 
         user_role=UserRole.objects.get(user=request.user)
         payment=Payment.objects.all()[0]
-        Booked.objects.create(number_of_days=number_of_days,start_date=s_d,end_date=e_d,user_role=user_role,room_id=room_id,payment=payment)
+        
+        # Booked.objects.create(number_of_days=number_of_days,start_date=s_d,end_date=e_d,user_role=user_role,room_id=room_id,payment=payment)
+
+        room_List = Room.objects.filter(pk=room_id)[0]
+
+        booked_list=Booked.objects.filter(room_id=room_id)
         context = {
         
+        "number_of_days":number_of_days,
+        "total_amount":int(number_of_days) * int(Room.objects.get(pk=room_id).price),
+        "s_d":s_d,
+        "e_d":e_d,
+        "room_List":room_List,
+        "booked_list":booked_list,
+        "booking_start":True,
+        "room_id":room_id
         }
-        return redirect('/')
+
+        return render(request, 'HotelDetails/roomDetails.html', context)
+
+  
     
 
    
