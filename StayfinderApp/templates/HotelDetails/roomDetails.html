@@ -164,11 +164,13 @@
 
 
         
-            <form action="/booking/" method="post">
+            <form id="confirmation" action="/confirmation/" method="post">
 
                 {% csrf_token %} 
+
+                <input name="transaction_id" id="trannsaction_id" value="">
                 <label for="no_d">No. of days: </label>
-        
+                
              <input style="width: 8%; border: none;" type="text" name="number_of_days" value="{{number_of_days}}" readonly>  <span> Days</span>
              <label for="amt">Total Amount: </label>
              <input style="width: 19%; border: none;" type="text" name="total_amount" value="{{total_amount}}" readonly>  <span> Rupees.</span>
@@ -181,7 +183,9 @@
              <input type="text"  style="visibility: hidden;" name="room_id" value="{{room_id}}" >  
                 
                 <button type="submit">Confirm now</button>
+
             </form>
+            <button id="rzp-button1">Confirm and Pay</button>
 
         </div>
         <div class="modal-footer">
@@ -208,6 +212,55 @@
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('start-date').setAttribute('min', today);
     document.getElementById('end-date').setAttribute('min', today);
+</script>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_E8BePVLLdg7X0r", // Enter the Key ID generated from the Dashboard
+    "amount": "50000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "Stayfinder", //your business name
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    // "order_id": "order_9A33XWu170gUtm", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        alert(response.razorpay_payment_id);
+        document.getElementById('trannsaction_id').valule=response.razorpay_payment_id;
+
+        document.getElementById("confirmation").submit();
+       // do form submission
+
+       
+    },
+    "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+        "name": "{{request.user.username}}", //your customer's name
+        "email": "{{request.username.user}}", 
+        "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
 </script>
 
 {% endblock %}

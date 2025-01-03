@@ -217,7 +217,8 @@ def Logout(request):
         logout(request)
         return redirect('/')
 
-@login_required
+@login_required(login_url='/login')
+
 def profile_view(request):
     # Get or create profile for the logged-in user
     profile, created = Profile.objects.get_or_create(user=request.user)
@@ -233,7 +234,7 @@ from datetime import datetime
 date_format = "%Y-%m-%d"
 
 # Convert string to date object (we ignore time)
-@login_required
+@login_required(login_url='/login')
 def Booking(request):
     if request.method == 'POST':
         room_id = request.POST['room_id']
@@ -270,11 +271,30 @@ def Booking(request):
 
         return render(request, 'HotelDetails/roomDetails.html', context)
 
+
+@login_required(login_url='/login')
+def Confirmation(request):
+    if request.method == 'POST':
+        room_id = request.POST['room_id']
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
+        total_amount = request.POST['total_amount']
+
+        user_role=UserRole.objects.get(user=request.user)
+
+        transaction_id = request.POST['transaction_id']
+        payment=Payment.objects.create(transaction_id=transaction_id,paid_amount=total_amount,user_role=user_role)
+        
+        Booked.objects.create(number_of_days=number_of_days,start_date=s_d,end_date=e_d,user_role=user_role,room_id=room_id,payment=payment)
+
+      
+        context = {
+       "message":"suceessfully Booked a Room"
+        }
+
+        return render(request, 'sucess.html', context)
+
   
-    
-
-   
-
    
 
 
