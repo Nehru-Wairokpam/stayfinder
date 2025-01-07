@@ -8,6 +8,7 @@ from django.contrib.auth import login as auth_login
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 
+
 from .models import AdsSlide, Hotel, Role, Room, UserRole, Booked,Payment
 # Create your views here.
 
@@ -103,9 +104,11 @@ def hotel_Details(request):
 def room_Details(request):
     room_id = request.GET["room"]
     room_List = Room.objects.filter(pk=room_id)[0]
+    booked_list=Booked.objects.filter(room_id=room_id)
 
     context={
-        "room_List":room_List
+        "room_List":room_List,
+        "booked_list":booked_list
 
     }
     return render(request, 'HotelDetails/roomDetails.html', context)
@@ -226,104 +229,78 @@ def profile_view(request):
 from datetime import datetime
 date_format = "%Y-%m-%d"
 
-@login_required
+@login_required(login_url='/login')
 def Booking(request):
-    room_id = request.GET.get("room_id")  # Get room ID from the URL or form
-    hotel_id = request.GET.get("hotel")  # Get hotel ID for hotel details
-    is_booked = False
-    start_date, end_date, number_of_days = None, None, None
-
-    # Fetch hotel details if hotel_id is provided
-    hotelDetails = get_object_or_404(Hotel, pk=hotel_id) if hotel_id else None
-
-    # Check if the room is already booked
-    if room_id:
-        booked_room = Booked.objects.filter(room_id=room_id).first()
-        if booked_room:
-            is_booked = True
-            start_date = booked_room.start_date
-            end_date = booked_room.end_date
-            number_of_days = booked_room.number_of_days
-        else:
-            is_booked = False
-
-    # Handle POST request
     if request.method == 'POST':
-        try:
-            # Extract POST data
-            room_id = request.POST.get('room_id')
-            start_date = request.POST.get('start_date')
-            end_date = request.POST.get('end_date')
+        room_id = request.POST['room_id']
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
 
-            # Ensure required fields are provided
-            if not room_id or not start_date or not end_date:
-                raise ValueError("All fields are required.")
 
-            # Parse dates and calculate the number of days
-            date_format = "%Y-%m-%d"
-            start_date_obj = datetime.strptime(start_date, date_format)
-            end_date_obj = datetime.strptime(end_date, date_format)
+        n_o_d =  datetime.strptime(end_date, date_format).date() - datetime.strptime(start_date, date_format).date()
 
-            if start_date_obj >= end_date_obj:
-                raise ValueError("End date must be after start date.")
+        s_d=start_date + ' 12:00:00+00:00'
+        e_d=end_date + ' 12:00:00+00:00'
 
-            n_o_d = end_date_obj - start_date_obj
-            number_of_days = n_o_d.days + 1  # Include the end date
+        number_of_days=int((str(n_o_d).split(',')[0].split(' ')[0]))+1
 
-            # Convert dates to datetime format for database
-            s_d = start_date_obj.strftime("%Y-%m-%d 12:00:00+00:00")
-            e_d = end_date_obj.strftime("%Y-%m-%d 12:00:00+00:00")
+        user_role=UserRole.objects.get(user=request.user)
+        payment=Payment.objects.all()[0]
+        
+        # Booked.objects.create(number_of_days=number_of_days,start_date=s_d,end_date=e_d,user_role=user_role,room_id=room_id,payment=payment)
 
-            # Get user role and payment details
-            user_role = UserRole.objects.get(user=request.user)
-            payment = Payment.objects.first()  # Assuming the first payment record is used
+        room_List = Room.objects.filter(pk=room_id)[0]
 
-            # Create booking
-            Booked.objects.create(
-                number_of_days=number_of_days,
-                start_date=s_d,
-                end_date=e_d,
-                user_role=user_role,
-                room_id=room_id,
-                payment=payment
-            )
-            is_booked = True
+        booked_list=Booked.objects.filter(room_id=room_id)
+        context = {
+        
+        "number_of_days":number_of_days,
+        "total_amount":int(number_of_days) * int(Room.objects.get(pk=room_id).price),
+        "s_d":s_d,
+        "e_d":e_d,
+        "room_List":room_List,
+        "booked_list":booked_list,
+        "booking_start":True,
+        "room_id":room_id
+        }
 
-            # Add a success message
-            messages.success(request, "Room booked successfully!")
-            # Redirect on success
-            return redirect('/')
+        return render(request, 'HotelDetails/roomDetails.html', context)
 
-        except ValueError as e:
-            # Handle validation errors
-            context = {
-                "hotelDetails": hotelDetails,
-                "is_booked": is_booked,
-                "start_date": start_date,
-                "end_date": end_date,
-                "number_of_days": number_of_days,
-                "error": str(e),
-            }
-            return render(request, "HotelDetails/roomDetails.html", context)
 
-        except Exception as e:
-            # Handle unexpected errors
-            context = {
-                "hotelDetails": hotelDetails,
-                "is_booked": is_booked,
-                "start_date": start_date,
-                "end_date": end_date,
-                "number_of_days": number_of_days,
-                "error": "An unexpected error occurred. Please try again.",
-            }
-            return render(request, "HotelDetails/roomDetails.html", context)
+@login_required(login_url='/login')
+def Confirmation(request):
+    if request.method == 'POST':
+        room_id = request.POST['room_id']
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
+        total_amount = request.POST['total_amount']
+        number_of_days=request.POST['number_of_days']
 
-    # Render the booking page for GET requests
-    context = {
-        "hotelDetails": hotelDetails,
-        "is_booked": is_booked,
-        "start_date": start_date,
-        "end_date": end_date,
-        "number_of_days": number_of_days,
+        user_role=UserRole.objects.get(user=request.user)
+
+        transaction_id = request.POST['transaction_id']
+        payment=Payment.objects.create(transaction_id=transaction_id,paid_amount=total_amount,user_role=user_role)
+        
+        Booked.objects.create(number_of_days=number_of_days,start_date=start_date,end_date=end_date,user_role=user_role,room_id=room_id,payment=payment)
+
+      
+        context = {
+       "message":"suceessfully Booked a Room"
+        }
+
+        return render(request, 'success.html', context)
+    
+@login_required(login_url='/login')
+def Profile(request):
+
+    context={
+       
     }
-    return render(request, "", context)
+    return render(request, 'profile.html',context)
+
+def Contact(request):
+
+    context={
+       
+    }
+    return render(request, 'contact.html',context)
