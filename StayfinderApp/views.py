@@ -1,4 +1,5 @@
 from profile import Profile
+import profile
 from django.contrib import messages
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -7,6 +8,7 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from .models import UserRole
 
 
 from .models import AdsSlide, Hotel, Role, Room, UserRole, Booked,Payment
@@ -273,7 +275,8 @@ def Confirmation(request):
         room_id = request.POST['room_id']
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
-        total_amount = request.POST['total_amount']
+        
+        total_amount = request.POST['total_amount'].replace('₹', '').replace(',', '')  # Remove ₹ and commas
         number_of_days=request.POST['number_of_days']
 
         user_role=UserRole.objects.get(user=request.user)
@@ -282,25 +285,38 @@ def Confirmation(request):
         payment=Payment.objects.create(transaction_id=transaction_id,paid_amount=total_amount,user_role=user_role)
         
         Booked.objects.create(number_of_days=number_of_days,start_date=start_date,end_date=end_date,user_role=user_role,room_id=room_id,payment=payment)
-
-      
+        total_amount_rupees = total_amount
         context = {
-       "message":"suceessfully Booked a Room"
+       "message":"suceessfully Booked a Room",
+       "total_amount":"total_amount_rupees"
         }
 
         return render(request, 'success.html', context)
     
+
+
+    
 @login_required(login_url='/login')
 def Profile(request):
+    profile = UserRole.objects.get(user=request.user)
 
-    context={
-       
+    context = {
+        'full_name': profile.user_name if profile else request.user.username,
+        'email': request.user.email,
+        'phone': profile.phone if profile else "",
+        'address': profile.address if profile else "",
+        'role': profile.role if profile else "",
     }
-    return render(request, 'profile.html',context)
+    
+    return render(request, 'profile.html', context)
+
+
+
+
 
 def Contact(request):
 
     context={
-       
+      
     }
     return render(request, 'contact.html',context)

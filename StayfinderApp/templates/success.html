@@ -1,13 +1,49 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="container">
+<style>
+    .success-message {
+      background-color: #28a745;
+      color: white;
+      padding: 50px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+  
+    .btn-custom {
+      background-color: #007bff;
+      color: white;
+      padding: 12px 35px;
+      font-size: 18px;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+  
+    .btn-custom:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+      text-decoration: none;
+    }
+  
+    .success-message h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+  
+    .success-message p {
+      font-size: 1.25rem;
+      margin-bottom: 30px;
+    }
+  </style>
+  
+  <div class="container d-flex justify-content-center align-items-center" style="height: 41vh;">
     <div class="success-message">
-        <h1>Success!</h1>
-        <p>Your action was completed successfully.</p>
-        <a href="/" class="btn btn-custom">Go to Homepage</a>
+      <h1>Success!</h1>
+      <p>Your Room Reservation was completed successfully.</p>
+      <a href="/" class="btn btn-custom">Go to Homepage</a>
     </div>
-</div>
-
+  </div>
 {% endblock %}
