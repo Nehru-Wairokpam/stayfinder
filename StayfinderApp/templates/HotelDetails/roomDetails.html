@@ -270,7 +270,7 @@
     document.getElementById('end-date').setAttribute('min', today);
 </script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 {% load custom_filters %}
 <script>
@@ -282,14 +282,21 @@ var options = {
     "description": "Test Transaction",
     "image": "https://example.com/your_logo",
     // "order_id": "order_9A33XWu170gUtm", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "handler": function (response){
-        alert(response.razorpay_payment_id);
-        document.getElementById('trannsaction_id').value=response.razorpay_payment_id;
+    "handler": function (response) {
+    // Update the transaction ID in the hidden input field
+    document.getElementById('trannsaction_id').value = response.razorpay_payment_id;
 
+    // Show the SweetAlert popup
+    Swal.fire({
+        title: 'Payment Complete!',
+        // text: `Your Payment ID: ${response.razorpay_payment_id}`,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        allowOutsideClick: false, // Prevent closing by clicking outside
+    }).then(() => {
+        // Submit the form after the user clicks "OK"
         document.getElementById("confirmation").submit();
-       // do form submission
-
-       
+    });
     },
     "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
         "name": "{{request.user.username}}", //your customer's name
